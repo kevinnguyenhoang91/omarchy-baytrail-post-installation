@@ -17,7 +17,8 @@
 [Full Guide](#-full-installation-guide) •
 [What the Script Does](#%EF%B8%8F-what-the-script-does) •
 [Troubleshooting](#-troubleshooting) •
-[FAQ](#-faq)
+[FAQ](#-faq) •
+[Misc](#-misc)
 
 </div>
 
@@ -396,6 +397,58 @@ Omarchy snapshots the root (`@`) subvolume with snapper. Btrfs can't snapshot a 
 <summary><b>Will kernel updates break booting?</b></summary>
 
 No. The `linux-lts` preset now builds a classic initramfs, and GRUB lives at the firmware fallback path. If you change `/etc/default/grub`, run `grub-mkconfig -o /boot/grub/grub.cfg`.
+</details>
+
+---
+
+## 🧰 Misc
+
+### 📸 Turn off automatic Btrfs snapshots
+
+Omarchy takes automatic snapshots with **snapper**. On a 32 GB eMMC they can fill the disk quickly. Run these after Omarchy boots:
+
+**1. List the snapper configs** (usually `root`, sometimes `home`):
+
+```bash
+sudo snapper list-configs
+```
+
+**2. Stop the hourly snapshots and the one taken at each boot:**
+
+```bash
+sudo snapper -c root set-config TIMELINE_CREATE=no
+sudo systemctl disable --now snapper-timeline.timer snapper-boot.timer
+```
+
+> [!TIP]
+> If step 1 listed a `home` config, run the `set-config` line again with `-c home`.
+
+**3. Stop the snapshots taken before and after every `pacman` install or update:**
+
+```bash
+sudo pacman -Rns snap-pac
+```
+
+**4. Optional: free up space by deleting existing snapshots:**
+
+```bash
+sudo snapper -c root list
+sudo snapper -c root delete 1-999      # use the ID range from the list above
+```
+
+> [!NOTE]
+> Keep `snapper-cleanup.timer` enabled. It only deletes old snapshots.
+> `omarchy-update` may still take one snapshot before each update. If new snapshots keep appearing, check `sudo snapper -c root list` after your next update.
+
+<details>
+<summary>↩️ Turn them back on</summary>
+
+```bash
+sudo snapper -c root set-config TIMELINE_CREATE=yes
+sudo systemctl enable --now snapper-timeline.timer snapper-boot.timer
+sudo pacman -S snap-pac
+```
+
 </details>
 
 ---
