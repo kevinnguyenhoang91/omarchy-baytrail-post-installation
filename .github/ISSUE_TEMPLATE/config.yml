@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 📖 Read the Troubleshooting guide first
+    url: https://github.com/kevinnguyenhoang91/omarchy-baytrail-post-installation#-troubleshooting
+    about: Kernel panics, empty GRUB menu, LUKS prompt errors and emergency-shell recovery.
+  - name: 🐧 Omarchy itself (not Bay Trail specific)
+    url: https://github.com/basecamp/omarchy/issues
+    about: Problems with Hyprland, apps or the Omarchy installer that also happen on normal hardware.

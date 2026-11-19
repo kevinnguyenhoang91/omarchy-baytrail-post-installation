@@ -370,7 +370,14 @@ No. The `linux-lts` preset now builds a classic initramfs, and GRUB lives at the
 
 ## 🤝 Contributing
 
-Got another Bay Trail device working? Found a bug? [Open an issue](https://github.com/kevinnguyenhoang91/omarchy-baytrail-post-installation/issues) or send a PR. Please run `shellcheck` on script changes.
+Contributions are welcome, especially from people with Bay Trail hardware to test on! 🙌
+
+- 💻 **Got it running on another device?** Open a [Device report](https://github.com/kevinnguyenhoang91/omarchy-baytrail-post-installation/issues/new?template=device_report.yml) so it can join the [Tested devices](#-tested-devices) table.
+- 🐛 **Something broke?** Open a [Bug report](https://github.com/kevinnguyenhoang91/omarchy-baytrail-post-installation/issues/new?template=bug_report.yml) with your device, the failing step and the error.
+- ✨ **Have an idea?** Open a [Feature request](https://github.com/kevinnguyenhoang91/omarchy-baytrail-post-installation/issues/new?template=feature_request.yml).
+- 🔧 **Want to fix something?** Branch from `main`, keep the script idempotent, run `shellcheck`, sign your commits, and open a pull request.
+
+Please read **[CONTRIBUTING.md](CONTRIBUTING.md)** before opening a pull request.
 
 ## 🙏 Credits
 

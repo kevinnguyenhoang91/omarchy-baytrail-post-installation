@@ -1,0 +1,52 @@
+name: 💻 Device report
+description: Tell us whether Omarchy works on your Bay Trail device
+title: "[Device]: "
+labels: ["device report"]
+body:
+  - type: markdown
+    attributes:
+      value: Device reports grow the **Tested devices** table in the README. Working or not, every report helps! 🙏
+  - type: input
+    id: model
+    attributes:
+      label: Device model
+      placeholder: e.g. Asus T100TA
+    validations:
+      required: true
+  - type: input
+    id: cpu
+    attributes:
+      label: CPU
+      placeholder: e.g. Atom Z3740
+    validations:
+      required: true
+  - type: input
+    id: screen
+    attributes:
+      label: Screen size and resolution
+      placeholder: e.g. 10.1" 1366×768
+  - type: input
+    id: memory
+    attributes:
+      label: RAM / storage
+      placeholder: e.g. 2 GB / 32 GB eMMC
+  - type: input
+    id: firmware-key
+    attributes:
+      label: Firmware setup key
+      placeholder: e.g. F2, Del, Esc
+  - type: dropdown
+    id: result
+    attributes:
+      label: Result
+      options:
+        - ✅ Works with the guide as-is
+        - ⚠️ Works with extra steps (describe below)
+        - ❌ Doesn't work
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+      description: Extra steps you needed, what doesn't work (Wi-Fi, audio, touchscreen, suspend…), or where it failed.
