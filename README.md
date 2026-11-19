@@ -44,8 +44,7 @@ This repo fixes both with **one script**: it switches you to `linux-lts`, instal
 - 🛡️ **`linux-lts`** kernel replaces the crashing mainline kernel
 - 🔐 **Auto-detects LUKS** and writes the correct `cryptdevice=UUID=…` cmdline
 - 💾 Early **eMMC + Btrfs + dm-crypt** modules baked into the initramfs
-- 🧠 **3 GB zstd zram** + **4 GB swapfile in a dedicated `/swap` Btrfs subvolume** (snapshot-safe) to survive on 2 GB RAM
-- 🔤 Big, readable **Terminus TTY font** for tiny high-DPI screens
+- 🧠 **4 GB swapfile in a dedicated `/swap` Btrfs subvolume** (snapshot-safe) to survive on 2 GB RAM
 - ♻️ **Idempotent** — safe to re-run
 
 ## 💻 Tested devices
@@ -142,7 +141,7 @@ Unplug USB 2 when the screen goes black. **Omarchy should now boot.** 🎉
 
 ### Hardware considerations (2 GB RAM / 32 GB eMMC)
 
-- **RAM (2 GB DDR3L, soldered):** use `zram` (1.5× RAM ≈ 3 GB) + a 4 GB swapfile in its own `/swap` Btrfs subvolume so updates and browsing don't trigger OOM freezes.
+- **RAM (2 GB DDR3L, soldered):** use a 4 GB swapfile in its own `/swap` Btrfs subvolume so updates and browsing don't trigger OOM freezes.
 - **Storage (32/64 GB eMMC):** wipe the factory partitions and use **Btrfs with `zstd` compression** (Omarchy's default).
 - **Kernel:** always use **`linux-lts`** to avoid the `intel_pmic_power_handler` eMMC crash.
 - **Networking:** Wi-Fi works out of the box with `iwctl` in the Arch live USB on both devices.
@@ -208,7 +207,7 @@ Run the [one-liner](#-quick-start-one-liner), or follow the manual steps below.
 #### 1. Install `linux-lts` and tools, remove mainline `linux`
 
 ```bash
-pacman -Syu linux-lts linux-lts-headers grub efibootmgr terminus-font zram-generator
+pacman -Syu linux-lts linux-lts-headers grub efibootmgr
 pacman -R linux
 ```
 
@@ -273,20 +272,9 @@ grub-mkconfig -o /boot/grub/grub.cfg
 grep "linux.*/vmlinuz" /boot/grub/grub.cfg
 ```
 
-#### 4. TTY font, zram, and swap subvolume
+#### 4. Swap subvolume (4 GB)
 
 ```bash
-# ter-132n for Pipo X9; ter-124n or ter-128n for X205TA
-echo "FONT=ter-132n" > /etc/vconsole.conf
-
-cat << 'EOF' > /etc/systemd/zram-generator.conf
-[zram0]
-zram-size = ram * 1.5
-compression-algorithm = zstd
-swap-priority = 100
-EOF
-
-# 4 GB swapfile inside a dedicated Btrfs subvolume
 btrfs subvolume create /swap
 btrfs filesystem mkswapfile --size 4g --uuid clear /swap/swapfile
 echo '/swap/swapfile none swap defaults 0 0' >> /etc/fstab
@@ -313,12 +301,10 @@ Open a terminal (`Super + Return`) and edit `~/.config/hypr/monitors.conf`:
 | Step | Action |
 |------|--------|
 | **0** | Checks it runs as root and that `/boot` is mounted |
-| **1/6** | Installs `linux-lts`, headers, `grub`, `efibootmgr`, `terminus-font`, `zram-generator`; removes mainline `linux` |
-| **2/6** | Copies `vmlinuz-linux-lts` to `/boot`, adds early Bay Trail modules, switches the preset from UKI to classic `initramfs`, runs `mkinitcpio -P` |
-| **3/6** | Installs `i386-efi` GRUB to `/boot/EFI/BOOT/BOOTIA32.EFI`, writes the LUKS/Btrfs kernel cmdline, runs `grub-mkconfig` |
-| **4/6** | Sets the TTY font to `ter-132n` |
-| **5/6** | Configures zstd zram at 1.5× RAM |
-| **6/6** | Creates a `/swap` Btrfs subvolume, a 4 GB swapfile inside it, and adds it to `/etc/fstab` |
+| **1/4** | Installs `linux-lts`, headers, `grub`, `efibootmgr`; removes mainline `linux` |
+| **2/4** | Copies `vmlinuz-linux-lts` to `/boot`, adds early Bay Trail modules, switches the preset from UKI to classic `initramfs`, runs `mkinitcpio -P` |
+| **3/4** | Installs `i386-efi` GRUB to `/boot/EFI/BOOT/BOOTIA32.EFI`, writes the LUKS/Btrfs kernel cmdline, runs `grub-mkconfig` |
+| **4/4** | Creates a `/swap` Btrfs subvolume, a 4 GB swapfile inside it, and adds it to `/etc/fstab` |
 
 At the end it prints the files in `/boot` and the active GRUB `linux` lines so you can check the result.
 

@@ -17,15 +17,15 @@ if ! findmnt /boot > /dev/null; then
    exit 1
 fi
 
-echo "==> [1/6] Installing linux-lts, GRUB, terminus-font, and zram-generator..."
-pacman -Syu --noconfirm --needed linux-lts linux-lts-headers grub efibootmgr terminus-font zram-generator
+echo "==> [1/4] Installing linux-lts and 32-bit GRUB tools..."
+pacman -Syu --noconfirm --needed linux-lts linux-lts-headers grub efibootmgr
 
 if pacman -Qi linux > /dev/null 2>&1; then
    echo "==> Removing mainline 'linux' kernel (prevents Bay Trail eMMC crash)..."
    pacman -R --noconfirm linux
 fi
 
-echo "==> [2/6] Copying vmlinuz-linux-lts to /boot and configuring mkinitcpio..."
+echo "==> [2/4] Copying vmlinuz-linux-lts to /boot and configuring mkinitcpio..."
 VMLINUZ_SRC=$(find /usr/lib/modules -maxdepth 2 -name "vmlinuz" | grep -- "-lts" | head -n 1 || true)
 if [[ -z "$VMLINUZ_SRC" ]]; then
    echo "Error: Could not find vmlinuz under /usr/lib/modules/*-lts/"
@@ -56,7 +56,7 @@ EOF
 
 mkinitcpio -P
 
-echo "==> [3/6] Installing 32-bit UEFI GRUB (i386-efi)..."
+echo "==> [3/4] Installing 32-bit UEFI GRUB (i386-efi)..."
 grub-install --target=i386-efi --efi-directory=/boot --bootloader-id=GRUB --removable
 
 LUKS_UUID=$(blkid -t TYPE=crypto_LUKS -s UUID -o value | head -n 1 || true)
@@ -77,18 +77,7 @@ fi
 
 grub-mkconfig -o /boot/grub/grub.cfg
 
-echo "==> [4/6] Configuring larger TTY console font (ter-132n)..."
-echo "FONT=ter-132n" > /etc/vconsole.conf
-
-echo "==> [5/6] Configuring 3 GB compressed zram (ram * 1.5)..."
-cat << 'EOF' > /etc/systemd/zram-generator.conf
-[zram0]
-zram-size = ram * 1.5
-compression-algorithm = zstd
-swap-priority = 100
-EOF
-
-echo "==> [6/6] Creating 4 GB swapfile in a dedicated Btrfs subvolume (/swap)..."
+echo "==> [4/4] Creating 4 GB swapfile in a dedicated Btrfs subvolume (/swap)..."
 # A nested subvolume is excluded from snapper snapshots of '@', so an active
 # swapfile never blocks Omarchy's root snapshots.
 if [[ -e /swap ]] && ! btrfs subvolume show /swap > /dev/null 2>&1; then
