@@ -1,0 +1,78 @@
+name: 🐛 Bug report
+description: Something in the guide or script failed or didn't boot
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the report! Please check the [Troubleshooting](https://github.com/kevinnguyenhoang91/omarchy-baytrail-post-installation#-troubleshooting) section first.
+        ⚠️ Don't paste passwords or Wi-Fi keys. UUIDs are fine.
+  - type: dropdown
+    id: device
+    attributes:
+      label: Device
+      options:
+        - Pipo X9
+        - Asus EeeBook X205TA
+        - Other Bay Trail device (write the model below)
+    validations:
+      required: true
+  - type: input
+    id: device-other
+    attributes:
+      label: Other device model / CPU
+      placeholder: e.g. Chuwi Hi8, Atom Z3736F
+  - type: dropdown
+    id: luks
+    attributes:
+      label: Is the root partition encrypted (LUKS)?
+      options:
+        - "Yes"
+        - "No"
+        - Not sure
+    validations:
+      required: true
+  - type: dropdown
+    id: stage
+    attributes:
+      label: Where did it fail?
+      options:
+        - Booting the Omarchy USB
+        - Omarchy installer
+        - Booting the Arch rescue USB / Wi-Fi
+        - Unlocking / mounting / chroot
+        - Running the post-install script
+        - First boot after the script (GRUB / kernel / LUKS prompt)
+        - After booting into Omarchy
+    validations:
+      required: true
+  - type: input
+    id: versions
+    attributes:
+      label: Omarchy ISO version and Arch ISO date
+      placeholder: e.g. Omarchy 3.2.0, archlinux-2026.11.01
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: The exact step, the full error, and what you expected. Screen photos are welcome.
+    validations:
+      required: true
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Diagnostics (run inside arch-chroot)
+      description: Output of `lsblk -f`, `grep CMDLINE /etc/default/grub`, `ls -lh /boot /boot/EFI/BOOT`, and the script output if you ran it.
+      render: shell
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checklist
+      options:
+        - label: I disabled Secure Boot and Fast Boot in the firmware setup
+          required: true
+        - label: I searched existing issues and this isn't a duplicate
+          required: true
