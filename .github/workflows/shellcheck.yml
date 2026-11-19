@@ -1,14 +1,47 @@
-name: ShellCheck
+name: Script Check
 
 on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
-  shellcheck:
+  check:
+    name: Lint & validate script
     runs-on: ubuntu-latest
+    env:
+      SCRIPT: omarchy-baytrail-postinstall.sh
     steps:
-      - uses: actions/checkout@v4
-      - name: Run ShellCheck
-        run: shellcheck omarchy-baytrail-postinstall.sh
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Bash syntax check
+        run: bash -n "$SCRIPT"
+
+      - name: ShellCheck
+        run: |
+          shellcheck --version
+          shellcheck --severity=style --shell=bash "$SCRIPT"
+
+      - name: No CRLF line endings (curl | bash safety)
+        run: |
+          if grep -q $'\r' "$SCRIPT"; then
+            echo "::error file=$SCRIPT::CRLF line endings found"
+            exit 1
+          fi
+
+      - name: No hidden control characters
+        run: |
+          if LC_ALL=C grep -nP '[\x00-\x08\x0B-\x1F\x7F]' "$SCRIPT"; then
+            echo "::error file=$SCRIPT::Hidden control characters found (see lines above)"
+            exit 1
+          fi
+
+      - name: Has bash shebang and is executable
+        run: |
+          head -n1 "$SCRIPT" | grep -qx '#!/usr/bin/env bash' || { echo "::error file=$SCRIPT::Missing '#!/usr/bin/env bash' shebang"; exit 1; }
+          test -x "$SCRIPT" || { echo "::error file=$SCRIPT::Script is not executable (git update-index --chmod=+x)"; exit 1; }

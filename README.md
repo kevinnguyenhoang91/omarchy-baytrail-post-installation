@@ -6,7 +6,7 @@
 
 *Pipo X9 · Asus EeeBook X205TA · any Intel Atom Z3735F / Z37xx device*
 
-[![ShellCheck](https://github.com/kevinnguyenhoang91/omarchy-baytrail-post-installation/actions/workflows/shellcheck.yml/badge.svg)](https://github.com/kevinnguyenhoang91/omarchy-baytrail-post-installation/actions/workflows/shellcheck.yml)
+[![Script Check](https://github.com/kevinnguyenhoang91/omarchy-baytrail-post-installation/actions/workflows/shellcheck.yml/badge.svg)](https://github.com/kevinnguyenhoang91/omarchy-baytrail-post-installation/actions/workflows/shellcheck.yml)
 [![Arch Linux](https://img.shields.io/badge/Arch_Linux-1793D1?logo=archlinux&logoColor=white)](https://archlinux.org)
 [![Omarchy](https://img.shields.io/badge/Omarchy-Hyprland-58E1FF?logo=hyprland&logoColor=white)](https://omarchy.org)
 [![UEFI](https://img.shields.io/badge/UEFI-IA32_(32--bit)-orange)](#-why-this-exists)
