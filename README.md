@@ -285,15 +285,6 @@ echo '/swap/swapfile none swap defaults 0 0' >> /etc/fstab
 
 </details>
 
-### Phase 5 — Display scaling after first boot
-
-Open a terminal (`Super + Return`) and edit `~/.config/hypr/monitors.conf`:
-
-| Device | Panel | Setting |
-|--------|-------|---------|
-| Pipo X9 | 8.9" 1920×1200 | `monitor=,preferred,auto,1.5` (or `1.75`) |
-| Asus X205TA | 11.6" 1366×768 | `monitor=,preferred,auto,1` |
-
 ---
 
 ## ⚙️ What the script does
