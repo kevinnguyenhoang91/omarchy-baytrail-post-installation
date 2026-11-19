@@ -65,7 +65,7 @@ flowchart LR
     A[💿 USB 1<br/>Omarchy ISO] -->|install to eMMC| B[❌ First boot fails]
     B --> C[💿 USB 2<br/>Arch Linux ISO]
     C -->|Wi-Fi + unlock + mount| D[arch-chroot /mnt]
-    D -->|curl … &#124; bash| E[🔧 postinstall script]
+    D -->|run script with curl| E[🔧 postinstall script]
     E --> F[✅ Omarchy boots]
 ```
 
