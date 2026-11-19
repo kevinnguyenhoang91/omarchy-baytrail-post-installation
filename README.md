@@ -44,7 +44,7 @@ This repo fixes both with **one script**: it switches you to `linux-lts`, instal
 - 🛡️ **`linux-lts`** kernel replaces the crashing mainline kernel
 - 🔐 **Auto-detects LUKS** and writes the correct `cryptdevice=UUID=…` cmdline
 - 💾 Early **eMMC + Btrfs + dm-crypt** modules baked into the initramfs
-- 🧠 **3 GB zstd zram** + **4 GB Btrfs swapfile** to survive on 2 GB RAM
+- 🧠 **3 GB zstd zram** + **4 GB swapfile in a dedicated `/swap` Btrfs subvolume** (snapshot-safe) to survive on 2 GB RAM
 - 🔤 Big, readable **Terminus TTY font** for tiny high-DPI screens
 - ♻️ **Idempotent** — safe to re-run
 
@@ -142,7 +142,7 @@ Unplug USB 2 when the screen goes black. **Omarchy should now boot.** 🎉
 
 ### Hardware considerations (2 GB RAM / 32 GB eMMC)
 
-- **RAM (2 GB DDR3L, soldered):** use `zram` (1.5× RAM ≈ 3 GB) + a 4 GB disk swapfile so updates and browsing don't trigger OOM freezes.
+- **RAM (2 GB DDR3L, soldered):** use `zram` (1.5× RAM ≈ 3 GB) + a 4 GB swapfile in its own `/swap` Btrfs subvolume so updates and browsing don't trigger OOM freezes.
 - **Storage (32/64 GB eMMC):** wipe the factory partitions and use **Btrfs with `zstd` compression** (Omarchy's default).
 - **Kernel:** always use **`linux-lts`** to avoid the `intel_pmic_power_handler` eMMC crash.
 - **Networking:** Wi-Fi works out of the box with `iwctl` in the Arch live USB on both devices.
@@ -273,7 +273,7 @@ grub-mkconfig -o /boot/grub/grub.cfg
 grep "linux.*/vmlinuz" /boot/grub/grub.cfg
 ```
 
-#### 4. TTY font, zram, and swapfile
+#### 4. TTY font, zram, and swap subvolume
 
 ```bash
 # ter-132n for Pipo X9; ter-124n or ter-128n for X205TA
@@ -286,9 +286,14 @@ compression-algorithm = zstd
 swap-priority = 100
 EOF
 
-btrfs filesystem mkswapfile --size 4g --uuid clear /swapfile
-echo '/swapfile none swap defaults 0 0' >> /etc/fstab
+# 4 GB swapfile inside a dedicated Btrfs subvolume
+btrfs subvolume create /swap
+btrfs filesystem mkswapfile --size 4g --uuid clear /swap/swapfile
+echo '/swap/swapfile none swap defaults 0 0' >> /etc/fstab
 ```
+
+> [!WARNING]
+> Don't put the swapfile directly in `/` (the `@` subvolume). Btrfs refuses to snapshot a subvolume with an active swapfile, which breaks Omarchy's snapper snapshots.
 
 </details>
 
@@ -313,7 +318,7 @@ Open a terminal (`Super + Return`) and edit `~/.config/hypr/monitors.conf`:
 | **3/6** | Installs `i386-efi` GRUB to `/boot/EFI/BOOT/BOOTIA32.EFI`, writes the LUKS/Btrfs kernel cmdline, runs `grub-mkconfig` |
 | **4/6** | Sets the TTY font to `ter-132n` |
 | **5/6** | Configures zstd zram at 1.5× RAM |
-| **6/6** | Creates a 4 GB Btrfs swapfile and adds it to `/etc/fstab` |
+| **6/6** | Creates a `/swap` Btrfs subvolume, a 4 GB swapfile inside it, and adds it to `/etc/fstab` |
 
 At the end it prints the files in `/boot` and the active GRUB `linux` lines so you can check the result.
 
@@ -369,7 +374,13 @@ The Omarchy USB installs the system. The Arch USB gives you a rescue shell to `a
 <details>
 <summary><b>Can I re-run the script?</b></summary>
 
-Yes. Packages use `--needed`, and the swapfile and `fstab` steps check whether they've already run.
+Yes. Packages use `--needed`, and the swap subvolume, swapfile and `fstab` steps check whether they've already run.
+</details>
+
+<details>
+<summary><b>Why a separate <code>/swap</code> subvolume instead of <code>/swapfile</code>?</b></summary>
+
+Omarchy snapshots the root (`@`) subvolume with snapper. Btrfs can't snapshot a subvolume that holds an active swapfile, so a `/swapfile` in `@` makes snapshots fail. A nested `/swap` subvolume is left out of `@` snapshots, so swap and snapshots work together. It mounts automatically with `@`, so no extra `fstab` mount line is needed.
 </details>
 
 <details>

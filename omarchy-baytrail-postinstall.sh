@@ -88,12 +88,21 @@ compression-algorithm = zstd
 swap-priority = 100
 EOF
 
-echo "==> [6/6] Creating 4 GB Btrfs swapfile..."
-if [[ ! -f /swapfile ]]; then
-   btrfs filesystem mkswapfile --size 4g --uuid clear /swapfile
+echo "==> [6/6] Creating 4 GB swapfile in a dedicated Btrfs subvolume (/swap)..."
+# A nested subvolume is excluded from snapper snapshots of '@', so an active
+# swapfile never blocks Omarchy's root snapshots.
+if [[ -e /swap ]] && ! btrfs subvolume show /swap > /dev/null 2>&1; then
+   echo "Error: /swap exists but is not a Btrfs subvolume. Move it aside and re-run."
+   exit 1
 fi
-if ! grep -q '/swapfile' /etc/fstab; then
-   echo '/swapfile none swap defaults 0 0' >> /etc/fstab
+if [[ ! -e /swap ]]; then
+   btrfs subvolume create /swap
+fi
+if [[ ! -f /swap/swapfile ]]; then
+   btrfs filesystem mkswapfile --size 4g --uuid clear /swap/swapfile
+fi
+if ! grep -q '^/swap/swapfile' /etc/fstab; then
+   echo '/swap/swapfile none swap defaults 0 0' >> /etc/fstab
 fi
 
 echo ""
