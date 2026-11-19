@@ -67,6 +67,7 @@ flowchart LR
     subgraph P1[" ① INSTALL "]
         direction TB
         A(["💿 USB 1<br/><b>Omarchy ISO</b>"]) --> B["⚙️ Install to<br/>internal eMMC"]
+        B ~~~ P1Spacer["<br/>"]
     end
 
     subgraph P2[" ② RESCUE "]
@@ -77,6 +78,7 @@ flowchart LR
     subgraph P3[" ③ FIX "]
         direction TB
         F{{"🔧 <b>postinstall script</b>"}} --> G["🛡️ linux-lts<br/>🥾 32-bit GRUB<br/>💾 /swap subvolume"]
+        G ~~~ P3Spacer["<br/>"]
     end
 
     P1 -. "❌ first boot fails" .-> P2
@@ -87,19 +89,21 @@ flowchart LR
     classDef step fill:#f8fafc,stroke:#94a3b8,stroke-width:1.5px,color:#0f172a
     classDef script fill:#7c3aed,stroke:#5b21b6,stroke-width:2px,color:#ffffff
     classDef done fill:#16a34a,stroke:#166534,stroke-width:2px,color:#ffffff
+    classDef spacer fill:none,stroke:none,color:transparent
 
     class A,C usb
     class B,D,E,G step
     class F script
     class H done
+    class P1Spacer,P3Spacer spacer
 
     style P1 fill:none,stroke:#1793D1,stroke-width:2px,stroke-dasharray:6 4,color:#1793D1
     style P2 fill:none,stroke:#f59e0b,stroke-width:2px,stroke-dasharray:6 4,color:#f59e0b
     style P3 fill:none,stroke:#7c3aed,stroke-width:2px,stroke-dasharray:6 4,color:#7c3aed
 
-    linkStyle 4 stroke:#ef4444,stroke-width:2px,color:#ef4444
-    linkStyle 5 stroke:#7c3aed,stroke-width:3px
-    linkStyle 6 stroke:#16a34a,stroke-width:3px
+    linkStyle 6 stroke:#ef4444,stroke-width:2px,color:#ef4444
+    linkStyle 7 stroke:#7c3aed,stroke-width:3px
+    linkStyle 8 stroke:#16a34a,stroke-width:3px
 ```
 
 ## 📋 Requirements
