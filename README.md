@@ -451,6 +451,37 @@ sudo pacman -S snap-pac
 
 </details>
 
+### ⏱️ Skip the `/dev/tpmrm0` wait at boot
+
+If boot stops on **"A start job is running for /dev/tpmrm0 (… / 1min 30s)"**, the firmware is reporting a TPM that the kernel never makes usable, so systemd waits for it until it times out. Tell systemd not to wait for it:
+
+```bash
+sudo sed -i 's/^GRUB_CMDLINE_LINUX_DEFAULT="\(.*\)"/GRUB_CMDLINE_LINUX_DEFAULT="\1 systemd.tpm2_wait=0"/' /etc/default/grub
+grep CMDLINE_LINUX_DEFAULT /etc/default/grub     # check it was added once
+sudo grub-mkconfig -o /boot/grub/grub.cfg
+sudo reboot
+```
+
+Still waiting? Also mask the TPM device units:
+
+```bash
+sudo systemctl mask dev-tpm0.device dev-tpmrm0.device
+```
+
+> [!TIP]
+> **Skip it for one boot only:** at the GRUB menu press `e`, add ` systemd.tpm2_wait=0` to the end of the line starting with `linux`, then press `Ctrl+X`.
+
+<details>
+<summary>↩️ Undo</summary>
+
+```bash
+sudo sed -i 's/ systemd.tpm2_wait=0//' /etc/default/grub
+sudo grub-mkconfig -o /boot/grub/grub.cfg
+sudo systemctl unmask dev-tpm0.device dev-tpmrm0.device
+```
+
+</details>
+
 ---
 
 ## 🤝 Contributing
