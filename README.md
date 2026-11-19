@@ -61,12 +61,44 @@ This repo fixes both with **one script**: it switches you to `linux-lts`, instal
 ## 🧭 How it works
 
 ```mermaid
+%%{init: {"flowchart": {"curve": "basis", "padding": 12}} }%%
 flowchart LR
-    A[💿 USB 1<br/>Omarchy ISO] -->|install to eMMC| B[❌ First boot fails]
-    B --> C[💿 USB 2<br/>Arch Linux ISO]
-    C -->|Wi-Fi + unlock + mount| D[arch-chroot /mnt]
-    D -->|run script with curl| E[🔧 postinstall script]
-    E --> F[✅ Omarchy boots]
+    subgraph P1[" ① INSTALL "]
+        direction TB
+        A(["💿 USB 1<br/><b>Omarchy ISO</b>"]) --> B["⚙️ Install to<br/>internal eMMC"]
+    end
+
+    subgraph P2[" ② RESCUE "]
+        direction TB
+        C(["💿 USB 2<br/><b>Arch Linux ISO</b>"]) --> D["📶 Wi-Fi<br/>🔓 Unlock · 📂 Mount"] --> E[["🐚 arch-chroot /mnt"]]
+    end
+
+    subgraph P3[" ③ FIX "]
+        direction TB
+        F{{"🔧 <b>postinstall script</b>"}} --> G["🛡️ linux-lts<br/>🥾 32-bit GRUB<br/>💾 /swap subvolume"]
+    end
+
+    P1 -. "❌ first boot fails" .-> P2
+    P2 == "⬇️ curl script" ==> P3
+    P3 ==> H(["🎉 <b>Omarchy boots!</b>"])
+
+    classDef usb fill:#1793D1,stroke:#0b5f8a,stroke-width:2px,color:#ffffff
+    classDef step fill:#f8fafc,stroke:#94a3b8,stroke-width:1.5px,color:#0f172a
+    classDef script fill:#7c3aed,stroke:#5b21b6,stroke-width:2px,color:#ffffff
+    classDef done fill:#16a34a,stroke:#166534,stroke-width:2px,color:#ffffff
+
+    class A,C usb
+    class B,D,E,G step
+    class F script
+    class H done
+
+    style P1 fill:none,stroke:#1793D1,stroke-width:2px,stroke-dasharray:6 4,color:#1793D1
+    style P2 fill:none,stroke:#f59e0b,stroke-width:2px,stroke-dasharray:6 4,color:#f59e0b
+    style P3 fill:none,stroke:#7c3aed,stroke-width:2px,stroke-dasharray:6 4,color:#7c3aed
+
+    linkStyle 4 stroke:#ef4444,stroke-width:2px,color:#ef4444
+    linkStyle 5 stroke:#7c3aed,stroke-width:3px
+    linkStyle 6 stroke:#16a34a,stroke-width:3px
 ```
 
 ## 📋 Requirements
